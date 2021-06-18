@@ -51,15 +51,14 @@ class CartState extends State<Cart> with Superbase {
     };
 
     this.ajax(
-        url: "cart/products",
-        method: "POST",
+        url: "cart?token=${await findToken}",
         server: server,
         data: FormData.fromMap(data1),
         onValue: (object, url) {
-          print(url);
+          print(object);
           setState(() {
             loadingProducts = false;
-            if (object['data'] is Map) {
+            if (object is Map) {
               productsList = (object['data'] as Iterable)
                   .map((e) => CartItem.fromJson(e))
                   .toList();
@@ -136,12 +135,27 @@ class CartState extends State<Cart> with Superbase {
   }
 
 ////////////
-  removeCart(String cartId) async {
+  removeCart(ProductCart pro) async {
     showLoading("Removing item...");
+    await this.ajax(
+        url: "cart/delete?token=${await findToken}&product_id=${pro.productId}",
+        onValue: (source, url) {
+          print(source);
+          reLoad();
+        });
+    Navigator.maybePop(context);
   }
 
-  modifyCart(String cartId, String quantity) async {
-    // showLoading("Removing item...");
+  modifyCart(ProductCart pro) async {
+    showLoading("Modifying item...");
+    await this.ajax(
+        url:
+            "cart/update?token=${await findToken}&product_id=${pro.productId}&quantity=${pro.quantity}",
+        onValue: (source, url) {
+          print(source);
+          reLoad();
+        });
+    Navigator.maybePop(context);
   }
 
   showLoading(msg) {
@@ -229,6 +243,8 @@ class CartState extends State<Cart> with Superbase {
                                                 image: CachedNetworkImageProvider(
                                                     "${productsList[index].productCart.thumb}"),
                                                 width: 100,
+                                                height: 100,
+                                                fit: BoxFit.cover,
                                               ),
                                               Container(
                                                 width: MediaQuery.of(context)
@@ -281,7 +297,7 @@ class CartState extends State<Cart> with Superbase {
                                                               removeCart(
                                                                   productsList[
                                                                           index]
-                                                                      .cartId);
+                                                                      .productCart);
                                                             },
                                                             child: Icon(
                                                               Icons
@@ -303,7 +319,7 @@ class CartState extends State<Cart> with Superbase {
                                                                 right: 10,
                                                                 top: 5),
                                                         child: Text(
-                                                          "${productsList[index].productCart.price} RWF/Item",
+                                                          "${fmtNbr(productsList[index].productCart.price!)} RWF/Item",
                                                           overflow: TextOverflow
                                                               .ellipsis,
                                                           textAlign:
@@ -327,26 +343,31 @@ class CartState extends State<Cart> with Superbase {
                                                               EdgeInsets.all(
                                                                   10),
                                                           decoration: BoxDecoration(
-                                                              color: Theme.of(
-                                                                      context)
-                                                                  .primaryColor,
+                                                              color: Color(
+                                                                  0xffFDE6E6),
                                                               borderRadius: BorderRadius
                                                                   .all(Radius
                                                                       .circular(
                                                                           25))),
                                                           child: Text(
-                                                            "${productsList[index].productCart.total} RWF",
+                                                            "${fmtNbr(productsList[index].productCart.total)} RWF",
                                                             style: TextStyle(
-                                                                color: Colors
-                                                                    .white,
                                                                 fontSize: 12),
                                                           ),
                                                         ),
                                                         Row(
                                                           children: [
                                                             Container(
-                                                              height: 30,
-                                                              width: 30,
+                                                              height: 27,
+                                                              width: 27,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                                color: Colors
+                                                                    .grey
+                                                                    .shade200,
+                                                              ),
                                                               child:
                                                                   RawMaterialButton(
                                                                 elevation: 0,
@@ -369,10 +390,8 @@ class CartState extends State<Cart> with Superbase {
                                                                         index] = p;
                                                                   });
 
-                                                                  modifyCart(
-                                                                      p.cartId,
-                                                                      p.productCart
-                                                                          .quantity);
+                                                                  modifyCart(p
+                                                                      .productCart);
                                                                 },
                                                                 child: Icon(
                                                                   Icons
@@ -389,8 +408,16 @@ class CartState extends State<Cart> with Superbase {
                                                                   "${productsList[index].productCart.quantity}"),
                                                             ),
                                                             Container(
-                                                              height: 30,
-                                                              width: 30,
+                                                              height: 27,
+                                                              width: 27,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                                color: Colors
+                                                                    .grey
+                                                                    .shade200,
+                                                              ),
                                                               margin: EdgeInsets
                                                                   .only(
                                                                       right: 7),
@@ -415,10 +442,8 @@ class CartState extends State<Cart> with Superbase {
                                                                     productsList[
                                                                         index] = p;
                                                                   });
-                                                                  modifyCart(
-                                                                      p.cartId,
-                                                                      p.productCart
-                                                                          .quantity);
+                                                                  modifyCart(p
+                                                                      .productCart);
                                                                 },
                                                                 child: Icon(
                                                                   Icons
@@ -440,19 +465,22 @@ class CartState extends State<Cart> with Superbase {
                               }),
                         ),
               productsList.length != 0
-                  ? ListTile(
-                      dense: true,
-                      title: Text("Sub total"),
-                      subtitle: Text(
-                          "${productsList.fold<double>(0.0, (previousValue, element) => previousValue + int.parse(element.productCart.total))} RWF"),
-                      trailing: RaisedButton(
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25)),
-                        color: Colors.green,
-                        onPressed: () async {},
-                        textColor: Colors.white,
-                        child: Text("Place order"),
+                  ? Container(
+                      decoration: BoxDecoration(color: Colors.grey.shade100),
+                      child: ListTile(
+                        dense: true,
+                        title: Text("Sub total"),
+                        subtitle: Text(
+                            "${fmtNbr(productsList.fold<double>(0.0, (previousValue, element) => previousValue + element.productCart.total))} RWF"),
+                        trailing: RaisedButton(
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25)),
+                          color: Colors.green,
+                          onPressed: () async {},
+                          textColor: Colors.white,
+                          child: Text("Checkout"),
+                        ),
                       ),
                     )
                   : Container()

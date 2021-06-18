@@ -4,6 +4,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:chinakigali/json/slide.dart';
 import 'package:chinakigali/product_details.dart';
+import 'package:chinakigali/product_item.dart';
+import 'package:chinakigali/search_delegate.dart';
+import 'package:chinakigali/search_product.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -168,193 +171,6 @@ class _ProductsState extends State<Products> with Superbase {
         });
   }
 
-  showAddCart(Product pro) {
-    showModalBottomSheet(
-        context: context,
-        useRootNavigator: true,
-        builder: (context) {
-          Product p = pro;
-          var price = pro.price;
-
-          bool adding = false;
-
-          return StatefulBuilder(builder: (context, newState) {
-            addToCart() async {
-              print("Adding.....");
-              newState(() {
-                adding = true;
-              });
-              try {
-                newState(() {
-                  adding = false;
-                });
-              } on DioError catch (e) {
-                newState(() {
-                  adding = false;
-                });
-                print(e);
-              }
-            }
-
-            return Container(
-                height: 160,
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Image(
-                      image: CachedNetworkImageProvider("${p.image}"),
-                      width: 100,
-                    ),
-                    Container(
-                      width: MediaQuery.of(context).size.width - 110,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                      left: 10, right: 10, top: 10),
-                                  child: Text("${p.product}",
-                                      textAlign: TextAlign.start,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      )),
-                                ),
-                              ),
-                              // Container(
-                              //   height: 30,
-                              //   width: 30,
-                              //   child: RawMaterialButton(
-                              //     elevation: 0,
-                              //     shape: new CircleBorder(),
-                              //     onPressed: () {
-                              //       Navigator.of(context).pop();
-                              //     },
-                              //     child: Icon(
-                              //       Icons.close_rounded,
-                              //       color: Colors.redAccent,
-                              //       size: 15,
-                              //     ),
-                              //   ),
-                              // ),
-                            ],
-                            mainAxisSize: MainAxisSize.max,
-                          ),
-                          // Padding(
-                          //     padding:
-                          //         EdgeInsets.only(left: 10, right: 10, top: 5),
-                          //     child: Text(
-                          //       "Minimum: 1",
-                          //       overflow: TextOverflow.ellipsis,
-                          //       textAlign: TextAlign.start,
-                          //       maxLines: 1,
-                          //       style: TextStyle(color: Colors.grey),
-                          //     )),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(7),
-                                margin: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    color: Theme.of(context).primaryColor,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(25))),
-                                child: Text(
-                                  "${fmtNbr(p.price)} RWF",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 12),
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Container(
-                                    height: 30,
-                                    width: 30,
-                                    child: RawMaterialButton(
-                                      elevation: 0,
-                                      shape: new CircleBorder(),
-                                      fillColor: Theme.of(context).accentColor,
-                                      onPressed: () {
-                                        newState(() => p = p);
-                                      },
-                                      child: Icon(
-                                        Icons.remove_rounded,
-                                        size: 15,
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text("1"),
-                                  ),
-                                  Container(
-                                    height: 30,
-                                    width: 30,
-                                    margin: EdgeInsets.only(right: 7),
-                                    child: RawMaterialButton(
-                                      elevation: 0,
-                                      shape: new CircleBorder(),
-                                      fillColor: Theme.of(context).accentColor,
-                                      onPressed: () {
-                                        newState(() => p = p);
-                                      },
-                                      child: Icon(
-                                        Icons.add_rounded,
-                                        size: 15,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            margin: EdgeInsets.only(left: 10),
-                            child: RaisedButton.icon(
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(7)),
-                              onPressed: adding
-                                  ? null
-                                  : () {
-                                      addToCart();
-                                      // Navigator.of(context).pop();
-                                    },
-                              icon: adding
-                                  ? Icon(
-                                      Icons.close_rounded,
-                                      color: Colors.transparent,
-                                    )
-                                  : Icon(Icons.add_shopping_cart_rounded),
-                              label: adding
-                                  ? SizedBox(
-                                      height: 25,
-                                      width: 25,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : Text("Add  to cart"),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                ));
-          });
-        });
-  }
-
   void cartCounter(int count, {bool? increment}) {}
 
   @override
@@ -370,7 +186,17 @@ class _ProductsState extends State<Products> with Superbase {
 //            IconButton(
 //                icon: Icon(Icons.notifications_rounded), onPressed: () {}),
           IconButton(
-              icon: Icon(Icons.search_rounded), color: color, onPressed: () {}),
+              icon: Icon(Icons.search_rounded),
+              color: color,
+              onPressed: () {
+                showSearch(
+                    context: context,
+                    delegate: SearchDemoSearchDelegate((query) {
+                      return SearchProduct(
+                        query: query,
+                      );
+                    }));
+              }),
         ],
       ),
       body: ListView(
@@ -444,93 +270,7 @@ class _ProductsState extends State<Products> with Superbase {
                                   childAspectRatio: 2.7 / 4),
                           itemCount: newArrivalsList.length,
                           itemBuilder: (context, index) {
-                            return Card(
-                              elevation: 0,
-                              clipBehavior: Clip.antiAliasWithSaveLayer,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(7))),
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      CupertinoPageRoute(
-                                          builder: (context) => ProductDetails(
-                                              pro: newArrivalsList[index],
-                                              cartCounter: cartCounter)));
-                                },
-                                child: Container(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Expanded(
-                                        child: Container(
-                                          margin: EdgeInsets.only(bottom: 5),
-                                          decoration: BoxDecoration(
-                                              image: DecorationImage(
-                                                  image:
-                                                      CachedNetworkImageProvider(
-                                                    "${newArrivalsList[index].image}",
-                                                  ),
-                                                  fit: BoxFit.cover)),
-                                        ),
-                                      ),
-                                      Padding(
-                                          padding: EdgeInsets.only(
-                                            left: 5,
-                                            right: 5,
-                                          ),
-                                          child: Text(
-                                            "${newArrivalsList[index].product}",
-                                            overflow: TextOverflow.ellipsis,
-                                            textAlign: TextAlign.start,
-                                            maxLines: 1,
-                                            style:
-                                                TextStyle(color: Colors.grey),
-                                          )),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: 5, right: 5),
-                                              child: Text(
-                                                "${fmtNbr(newArrivalsList[index].price)} RWF",
-                                                textAlign: TextAlign.start,
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 10),
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                            height: 35,
-                                            width: 35,
-                                            child: RawMaterialButton(
-                                              shape: new CircleBorder(),
-                                              onPressed: () {
-                                                showAddCart(
-                                                    newArrivalsList[index]);
-                                              },
-                                              child: Icon(
-                                                Icons.add_shopping_cart_rounded,
-                                                size: 20,
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
+                            return ProductItem(product: newArrivalsList[index]);
                           }),
                     ),
           Row(
@@ -576,105 +316,9 @@ class _ProductsState extends State<Products> with Superbase {
                       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                           maxCrossAxisExtent: 200, childAspectRatio: 2.7 / 4),
                       itemBuilder: (context, index) {
-                        return Card(
-                          elevation: 0,
-                          clipBehavior: Clip.antiAliasWithSaveLayer,
-                          shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(7))),
-                          child: InkWell(
-                            onTap: () {},
-                            child: Container(
-                              constraints: BoxConstraints.expand(),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Expanded(
-                                    child: Container(
-                                      margin: EdgeInsets.only(bottom: 5),
-                                      decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                              image: CachedNetworkImageProvider(
-                                                  "${specialProductsList[index].image}"),
-                                              fit: BoxFit.cover)),
-                                    ),
-                                  ),
-                                  Padding(
-                                      padding: EdgeInsets.only(
-                                        left: 5,
-                                        right: 5,
-                                      ),
-                                      child: Text(
-                                        "${specialProductsList[index].product}",
-                                        overflow: TextOverflow.ellipsis,
-                                        textAlign: TextAlign.start,
-                                        maxLines: 1,
-                                        style: TextStyle(color: Colors.grey),
-                                      )),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: 5, right: 5),
-                                              child: Text(
-                                                "${fmtNbr(specialProductsList[index].price)} RWF",
-                                                textAlign: TextAlign.start,
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    decoration: TextDecoration
-                                                        .lineThrough,
-                                                    fontSize: 12),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: 5, right: 5),
-                                              child: Text(
-                                                "${fmtNbr(specialProductsList[index].discountedPrice ?? 0)} RWF",
-                                                textAlign: TextAlign.start,
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: color,
-                                                    fontSize: 12),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Container(
-                                        height: 35,
-                                        width: 35,
-                                        child: RawMaterialButton(
-                                          shape: new CircleBorder(),
-                                          onPressed: () {
-                                            showAddCart(
-                                                specialProductsList[index]);
-                                          },
-                                          child: Icon(
-                                            Icons.add_shopping_cart_rounded,
-                                            size: 20,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                        return ProductItem(
+                          product: specialProductsList[index],
+                          isSpecial: true,
                         );
                       },
                       itemCount: specialProductsList.length),
@@ -721,83 +365,7 @@ class _ProductsState extends State<Products> with Superbase {
                       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                           maxCrossAxisExtent: 200, childAspectRatio: 2.7 / 4),
                       itemBuilder: (context, index) {
-                        return Card(
-                          elevation: 0,
-                          clipBehavior: Clip.antiAliasWithSaveLayer,
-                          shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(7))),
-                          child: InkWell(
-                            onTap: () {},
-                            child: Container(
-                              constraints: BoxConstraints.expand(),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Expanded(
-                                    child: Container(
-                                      margin: EdgeInsets.only(bottom: 5),
-                                      decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                              image: CachedNetworkImageProvider(
-                                                  "${productsList[index].image}"),
-                                              fit: BoxFit.cover)),
-                                    ),
-                                  ),
-                                  Padding(
-                                      padding: EdgeInsets.only(
-                                        left: 5,
-                                        right: 5,
-                                      ),
-                                      child: Text(
-                                        "${productsList[index].product}",
-                                        overflow: TextOverflow.ellipsis,
-                                        textAlign: TextAlign.start,
-                                        maxLines: 1,
-                                        style: TextStyle(color: Colors.grey),
-                                      )),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Padding(
-                                          padding: EdgeInsets.only(
-                                              left: 5, right: 5),
-                                          child: Text(
-                                            "${fmtNbr(productsList[index].price)} RWF",
-                                            textAlign: TextAlign.start,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 12),
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        height: 35,
-                                        width: 35,
-                                        child: RawMaterialButton(
-                                          shape: new CircleBorder(),
-                                          onPressed: () {
-                                            showAddCart(productsList[index]);
-                                          },
-                                          child: Icon(
-                                            Icons.add_shopping_cart_rounded,
-                                            size: 20,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
+                        return ProductItem(product: productsList[index]);
                       },
                       itemCount: productsList.length),
           Row(
@@ -843,83 +411,7 @@ class _ProductsState extends State<Products> with Superbase {
                       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                           maxCrossAxisExtent: 200, childAspectRatio: 2.7 / 4),
                       itemBuilder: (context, index) {
-                        return Card(
-                          elevation: 0,
-                          clipBehavior: Clip.antiAliasWithSaveLayer,
-                          shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(7))),
-                          child: InkWell(
-                            onTap: () {},
-                            child: Container(
-                              constraints: BoxConstraints.expand(),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Expanded(
-                                    child: Container(
-                                      margin: EdgeInsets.only(bottom: 5),
-                                      decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                              image: CachedNetworkImageProvider(
-                                                  "${bestSellingList[index].image}"),
-                                              fit: BoxFit.cover)),
-                                    ),
-                                  ),
-                                  Padding(
-                                      padding: EdgeInsets.only(
-                                        left: 5,
-                                        right: 5,
-                                      ),
-                                      child: Text(
-                                        "${bestSellingList[index].product}",
-                                        overflow: TextOverflow.ellipsis,
-                                        textAlign: TextAlign.start,
-                                        maxLines: 1,
-                                        style: TextStyle(color: Colors.grey),
-                                      )),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Padding(
-                                          padding: EdgeInsets.only(
-                                              left: 5, right: 5),
-                                          child: Text(
-                                            "${fmtNbr(bestSellingList[index].price)} RWF",
-                                            textAlign: TextAlign.start,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 12),
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        height: 35,
-                                        width: 35,
-                                        child: RawMaterialButton(
-                                          shape: new CircleBorder(),
-                                          onPressed: () {
-                                            showAddCart(bestSellingList[index]);
-                                          },
-                                          child: Icon(
-                                            Icons.add_shopping_cart_rounded,
-                                            size: 20,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
+                        return ProductItem(product: bestSellingList[index]);
                       },
                       itemCount: bestSellingList.length)
         ],

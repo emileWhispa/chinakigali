@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chinakigali/product_category.dart';
 import 'package:chinakigali/super_base.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'json/category.dart';
@@ -83,7 +85,14 @@ class _CategoriesState extends State<Categories> with Superbase {
                               child: Column(
                             children: [
                               ListTile(
-                                onTap: () {},
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      CupertinoPageRoute(
+                                          builder: (context) => ProductCategory(
+                                              category:
+                                                  categoriesList[index])));
+                                },
                                 leading: CircleAvatar(
                                   backgroundImage: CachedNetworkImageProvider(
                                       "${categoriesList[index].image}"),

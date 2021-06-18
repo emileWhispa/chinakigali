@@ -11,10 +11,14 @@ class Product {
 
   bool selected = false;
   bool deleting = false;
+  int views;
+
+  int quantity = 1;
 
   Product.fromJson(Map<String, dynamic> json)
       : id = json['product_id'],
         product = json['product_name'],
+        views = int.tryParse("${json['product_views']}") ?? 0,
         amount = int.tryParse(json['amount'] ?? "0") ?? 0,
         description = json['product_description'],
         _price = int.tryParse(json['product_price'] ?? "0.0") ?? 0,
@@ -47,8 +51,7 @@ class CartItem {
   CartItem({required this.cartId, required this.productCart});
 
   factory CartItem.fromJson(Map<String, dynamic> json) => CartItem(
-      cartId: json['cart_id'],
-      productCart: ProductCart.fromJson(json['product']));
+      cartId: json['cart_id'], productCart: ProductCart.fromJson(json));
 }
 
 class ProductCart {
@@ -58,8 +61,9 @@ class ProductCart {
   String? model;
   String quantity;
   bool? stock;
-  String? price;
-  String total;
+  int? price;
+  int total;
+  int views;
 
   ProductCart({
     this.productId,
@@ -70,16 +74,18 @@ class ProductCart {
     required this.total,
     this.thumb,
     this.price,
+    this.views: 0,
   });
   factory ProductCart.fromJson(Map<String, dynamic> json) => ProductCart(
-      price: "${json['price']}",
+      price: int.tryParse("${json['product_price']}") ?? 0,
       productId: json['product_id'],
-      thumb: json['thumb'],
-      name: json['name'],
+      thumb: json['product_image'],
+      name: json['product_name'],
       model: json['model'],
-      quantity: json['quantity'],
+      quantity: json['cart_qty'],
       stock: json['stock'],
-      total: "${json['total']}");
+      views: int.tryParse("${json['product_views']}") ?? 0,
+      total: int.tryParse("${json['cart_total']}") ?? 0);
 
   int get totalQuantity => int.tryParse(quantity) ?? 0;
 }

@@ -1,9 +1,13 @@
+import 'package:chinakigali/authentication.dart';
 import 'package:chinakigali/cart.dart';
 import 'package:chinakigali/categories.dart';
 import 'package:chinakigali/products.dart';
 import 'package:chinakigali/super_base.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart';
+
+import 'json/user.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,17 +20,21 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.red,
-      ),
+          // This is the theme of your application.
+          //
+          // Try running your application with "flutter run". You'll see the
+          // application has a blue toolbar. Then, without quitting the app, try
+          // changing the primarySwatch below to Colors.green and then invoke
+          // "hot reload" (press "r" in the console where you ran "flutter run",
+          // or simply save your changes to "hot reload" in a Flutter IDE).
+          // Notice that the counter didn't reset back to zero; the application
+          // is not restarted.
+          primarySwatch: Colors.red,
+          appBarTheme: AppBarTheme(
+              actionsIconTheme: IconThemeData(color: Colors.red),
+              textTheme: TextTheme(headline6: TextStyle(color: Colors.black)),
+              iconTheme: IconThemeData(color: Colors.red),
+              backgroundColor: Colors.white)),
       home: MyHomePage(title: 'China kigali'),
     );
   }
@@ -70,15 +78,20 @@ class _MyHomePageState extends State<MyHomePage> with Superbase {
   }
 
   void loadToken() async {
-    _token = (await prefs).getString("token");
+    _token = await findToken;
     this.ajax(
         url:
             "token?username=chinakigali&key=04dfe1f6e2d25c8073dc7237150f9fb67541186b&token=$_token",
+        server: true,
         onValue: (source, url) async {
           _token = source['token'];
           (await prefs).setString("token", _token!);
         });
   }
+
+  var _cartKey = new GlobalKey<CartState>();
+
+  User? _user;
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +104,9 @@ class _MyHomePageState extends State<MyHomePage> with Superbase {
             index: selected,
             children: [
               Products(cartCounter: cartCounter),
-              Cart(),
+              Cart(
+                key: _cartKey,
+              ),
               Categories(cartCounter: cartCounter),
               Center(),
               Center(),
@@ -103,8 +118,16 @@ class _MyHomePageState extends State<MyHomePage> with Superbase {
         currentIndex: selected,
         unselectedItemColor: Colors.grey,
         onTap: (i) {
+          if (i == 4 && _user == null) {
+            Navigator.push(context,
+                CupertinoPageRoute(builder: (context) => Authentication()));
+            return;
+          }
           setState(() {
             selected = i;
+            if (i == 1) {
+              _cartKey.currentState?.reLoad();
+            }
           });
         },
         type: BottomNavigationBarType.fixed,

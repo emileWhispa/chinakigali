@@ -1,10 +1,13 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'json/product.dart';
 
 class MyBehavior extends ScrollBehavior {
   @override
@@ -73,6 +76,196 @@ class Superbase {
     return fmt(test.toString());
   }
 
+  showAddCart(BuildContext context, Product pro) {
+    showModalBottomSheet(
+        context: context,
+        useRootNavigator: true,
+        builder: (context) {
+          Product p = pro;
+          var price = pro.price;
+
+          bool adding = false;
+
+          return StatefulBuilder(builder: (context, newState) {
+            addToCart() async {
+              print("Adding.....");
+              newState(() {
+                adding = true;
+              });
+              await ajax(
+                  url:
+                      "cart/add?token=${await findToken}&product_id=${pro.id}&quantity=${pro.quantity}",
+                  onValue: (source, url) {
+                    Navigator.maybePop(context);
+                  });
+              newState(() {
+                adding = false;
+              });
+            }
+
+            return Container(
+                height: 160,
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Image(
+                      image: CachedNetworkImageProvider("${p.image}"),
+                      width: 100,
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width - 110,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                      left: 10, right: 10, top: 10),
+                                  child: Text("${p.product}",
+                                      textAlign: TextAlign.start,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      )),
+                                ),
+                              ),
+                              // Container(
+                              //   height: 30,
+                              //   width: 30,
+                              //   child: RawMaterialButton(
+                              //     elevation: 0,
+                              //     shape: new CircleBorder(),
+                              //     onPressed: () {
+                              //       Navigator.of(context).pop();
+                              //     },
+                              //     child: Icon(
+                              //       Icons.close_rounded,
+                              //       color: Colors.redAccent,
+                              //       size: 15,
+                              //     ),
+                              //   ),
+                              // ),
+                            ],
+                            mainAxisSize: MainAxisSize.max,
+                          ),
+                          // Padding(
+                          //     padding:
+                          //         EdgeInsets.only(left: 10, right: 10, top: 5),
+                          //     child: Text(
+                          //       "Minimum: 1",
+                          //       overflow: TextOverflow.ellipsis,
+                          //       textAlign: TextAlign.start,
+                          //       maxLines: 1,
+                          //       style: TextStyle(color: Colors.grey),
+                          //     )),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(7),
+                                margin: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                    color: Theme.of(context).primaryColor,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(25))),
+                                child: Text(
+                                  "${fmtNbr(p.price)} RWF",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 12),
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    height: 30,
+                                    width: 30,
+                                    child: RawMaterialButton(
+                                      elevation: 0,
+                                      shape: new CircleBorder(),
+                                      fillColor: Theme.of(context).accentColor,
+                                      onPressed: () {
+                                        p.quantity--;
+                                        newState(() => p = p);
+                                      },
+                                      child: Icon(
+                                        Icons.remove_rounded,
+                                        size: 15,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text("${p.quantity}"),
+                                  ),
+                                  Container(
+                                    height: 30,
+                                    width: 30,
+                                    margin: EdgeInsets.only(right: 7),
+                                    child: RawMaterialButton(
+                                      elevation: 0,
+                                      shape: new CircleBorder(),
+                                      fillColor: Theme.of(context).accentColor,
+                                      onPressed: () {
+                                        p.quantity++;
+                                        newState(() => p = p);
+                                      },
+                                      child: Icon(
+                                        Icons.add_rounded,
+                                        size: 15,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            margin: EdgeInsets.only(left: 10),
+                            child: RaisedButton.icon(
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(7)),
+                              onPressed: adding
+                                  ? null
+                                  : () {
+                                      addToCart();
+                                      // Navigator.of(context).pop();
+                                    },
+                              icon: adding
+                                  ? Icon(
+                                      Icons.close_rounded,
+                                      color: Colors.transparent,
+                                    )
+                                  : Icon(Icons.add_shopping_cart_rounded),
+                              label: adding
+                                  ? SizedBox(
+                                      height: 25,
+                                      width: 25,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text("Add  to cart"),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ));
+          });
+        });
+  }
+
+  Future<String?> get findToken async => (await prefs).getString("token");
+
   Future<SharedPreferences> prefs = SharedPreferences.getInstance();
 
   bool canDecode(String jsonString) {
@@ -95,6 +288,7 @@ class Superbase {
       bool base2: false,
       String? authKey,
       bool json: true,
+      void Function(CancelToken token)? onCancelToken,
       bool absolutePath: false,
       ResponseType responseType: ResponseType.json,
       bool localSave: false,
@@ -133,13 +327,24 @@ class Superbase {
       return Future.value();
     }
 
+    CancelToken token = CancelToken();
+
+    if (onCancelToken != null) {
+      onCancelToken(token);
+    }
+
     Future<Response> future = method.toUpperCase() == "POST"
-        ? Dio().post(url, data: jsonData ?? map ?? data, options: opt)
+        ? Dio().post(url,
+            data: jsonData ?? map ?? data, options: opt, cancelToken: token)
         : method.toUpperCase() == "PUT"
-            ? Dio().put(url, data: jsonData ?? map ?? data, options: opt)
+            ? Dio().put(url,
+                data: jsonData ?? map ?? data, options: opt, cancelToken: token)
             : method.toUpperCase() == "DELETE"
-                ? Dio().delete(url, data: jsonData ?? map ?? data, options: opt)
-                : Dio().get(url, options: opt);
+                ? Dio().delete(url,
+                    data: jsonData ?? map ?? data,
+                    options: opt,
+                    cancelToken: token)
+                : Dio().get(url, options: opt, cancelToken: token);
 
     try {
       Response response = await future;

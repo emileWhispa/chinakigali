@@ -5,9 +5,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:get/get.dart' as gt;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'json/product.dart';
+import 'json/user.dart';
 
 class MyBehavior extends ScrollBehavior {
   @override
@@ -96,7 +98,11 @@ class Superbase {
                   url:
                       "cart/add?token=${await findToken}&product_id=${pro.id}&quantity=${pro.quantity}",
                   onValue: (source, url) {
-                    Navigator.maybePop(context);
+                    if (Navigator.canPop(context)) {
+                      Navigator.pop(context);
+                    }
+                    gt.Get.snackbar("Success", source['message'],
+                        icon: Icon(Icons.check_circle_rounded));
                   });
               newState(() {
                 adding = false;
@@ -265,6 +271,13 @@ class Superbase {
   }
 
   Future<String?> get findToken async => (await prefs).getString("token");
+  Future<User?> get findUser async {
+    var string = (await prefs).getString(userKey);
+    if (string != null) {
+      return User.fromJson(jsonDecode(string));
+    }
+    return null;
+  }
 
   Future<SharedPreferences> prefs = SharedPreferences.getInstance();
 

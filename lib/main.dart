@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:chinakigali/authentication.dart';
 import 'package:chinakigali/cart.dart';
 import 'package:chinakigali/categories.dart';
@@ -6,6 +8,7 @@ import 'package:chinakigali/super_base.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart';
+import 'package:get/get.dart';
 
 import 'json/user.dart';
 
@@ -17,7 +20,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
           // This is the theme of your application.
@@ -41,7 +44,8 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
+  final User? user;
+  MyHomePage({Key? key, required this.title, this.user}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -71,10 +75,16 @@ class _MyHomePageState extends State<MyHomePage> with Superbase {
 
   @override
   void initState() {
-    // TODO: implement initState
+    _user = widget.user;
     super.initState();
-    WidgetsBinding.instance!
-        .addPostFrameCallback((timeStamp) => this.loadToken());
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) async {
+      this.loadToken();
+      var string = (await prefs).getString(userKey);
+      if (string != null) {
+        _user = User.fromJson(jsonDecode(string));
+        setState(() {});
+      }
+    });
   }
 
   void loadToken() async {

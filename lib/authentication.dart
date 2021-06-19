@@ -1,9 +1,12 @@
 import 'dart:convert';
 
+import 'package:chinakigali/main.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'json/user.dart';
+import 'registration.dart';
 import 'super_base.dart';
 
 class Authentication extends StatefulWidget {
@@ -21,7 +24,7 @@ class _AuthenticationState extends State<Authentication> with Superbase {
 
   var _formKey = new GlobalKey<FormState>();
 
-  void register() {
+  void register() async {
     if (!(_formKey.currentState?.validate() ?? false)) {
       return;
     }
@@ -30,28 +33,25 @@ class _AuthenticationState extends State<Authentication> with Superbase {
       _sending = true;
     });
     this.ajax(
-        url: "shop/login",
-        method: "POST",
-        data: FormData.fromMap({
-          "shop_phone": _phoneController.text,
-          "shop_password": _passwordController.text
-        }),
+        url:
+            "account/login?token=${await findToken}&customer_phone=${Uri.encodeComponent(_phoneController.text)}&customer_password=${Uri.encodeComponent(_passwordController.text)}",
         onEnd: () {
           setState(() {
             _sending = false;
           });
         },
         onValue: (value, string) async {
+          print(value);
+          print(string);
           if (value['code'] == 200) {
-            //           var user = Shop.fromJson(value['data']);
-            (await prefs).setString(userKey, jsonEncode(value['data']));
+            var user = User.fromJson(value['customer']);
+            (await prefs).setString(userKey, jsonEncode(value['customer']));
             Navigator.popUntil(context, (route) => route.isFirst);
-            // Navigator.pushReplacement(
-            //     context,
-            //     CupertinoPageRoute(
-            //         builder: (context) => HomeScreen(
-            //               user: user,
-            //             )));
+            Navigator.pushReplacement(
+                context,
+                CupertinoPageRoute(
+                    builder: (context) =>
+                        MyHomePage(user: user, title: 'China kigali')));
           }
           print(value);
           showSnack(value['message']);
@@ -95,7 +95,7 @@ class _AuthenticationState extends State<Authentication> with Superbase {
                       border: OutlineInputBorder(
                           borderSide: BorderSide.none,
                           borderRadius: BorderRadius.circular(40)),
-                      fillColor: Colors.orange.shade200),
+                      fillColor: Color(0xffFDE6E6)),
                 ),
                 SizedBox(height: 17),
                 TextFormField(
@@ -119,7 +119,7 @@ class _AuthenticationState extends State<Authentication> with Superbase {
                       border: OutlineInputBorder(
                           borderSide: BorderSide.none,
                           borderRadius: BorderRadius.circular(40)),
-                      fillColor: Colors.orange.shade200),
+                      fillColor: Color(0xffFDE6E6)),
                 ),
                 SizedBox(height: 17),
                 _sending
@@ -135,8 +135,8 @@ class _AuthenticationState extends State<Authentication> with Superbase {
                         child: ElevatedButton(
                             style: ButtonStyle(
                                 elevation: MaterialStateProperty.all(1),
-                                backgroundColor:
-                                    MaterialStateProperty.all(Colors.orange),
+                                backgroundColor: MaterialStateProperty.all(
+                                    Color(0xffe62e04)),
                                 shape: MaterialStateProperty.all(
                                     RoundedRectangleBorder(
                                         borderRadius:
@@ -151,15 +151,15 @@ class _AuthenticationState extends State<Authentication> with Superbase {
                 ),
                 TextButton(
                   onPressed: () {
-                    // Navigator.push(
-                    //     context,
-                    //     CupertinoPageRoute(
-                    //         builder: (context) => Registration()));
+                    Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                            builder: (context) => Registration()));
                   },
                   child: Text(
                     "Don't have an Account ? Sign Up",
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.orange),
+                    style: TextStyle(color: Color(0xffe62e04)),
                   ),
                 ),
                 TextButton(
@@ -167,7 +167,7 @@ class _AuthenticationState extends State<Authentication> with Superbase {
                   child: Text(
                     "Forgot password ?",
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.orange),
+                    style: TextStyle(color: Color(0xffe62e04)),
                   ),
                 ),
                 Row(
@@ -175,20 +175,21 @@ class _AuthenticationState extends State<Authentication> with Superbase {
                     Expanded(
                         child: Container(
                       height: 2,
-                      color: Colors.grey.shade200,
+                      color: Color(0xffe62e04),
                     )),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
                         "OR",
                         style: TextStyle(
-                            color: Colors.orange, fontWeight: FontWeight.bold),
+                            color: Color(0xffe62e04),
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                     Expanded(
                         child: Container(
                       height: 2,
-                      color: Colors.grey.shade200,
+                      color: Color(0xffe62e04),
                     )),
                   ],
                 ),
@@ -198,19 +199,21 @@ class _AuthenticationState extends State<Authentication> with Superbase {
                     height: 50,
                     child: ElevatedButton(
                         style: ButtonStyle(
+                            elevation: MaterialStateProperty.all(1),
                             backgroundColor:
-                                MaterialStateProperty.all(Colors.indigo),
+                                MaterialStateProperty.all(Color(0xff02a1e2)),
                             shape: MaterialStateProperty.all(
                                 RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(40)))),
                         onPressed: () {
                           Navigator.popUntil(context, (route) => route.isFirst);
-                          // Navigator.pushReplacement(
-                          //     context,
-                          //     CupertinoPageRoute(
-                          //         builder: (context) => HomeScreen(
-                          //               user: null,
-                          //             )));
+                          Navigator.pushReplacement(
+                              context,
+                              CupertinoPageRoute(
+                                  builder: (context) => MyHomePage(
+                                        user: null,
+                                        title: "China Kigali",
+                                      )));
                         },
                         child: Text(
                           "Continue as Guest",

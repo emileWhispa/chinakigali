@@ -2,11 +2,13 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chinakigali/checkout_form.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import 'authentication.dart';
 import 'json/product.dart';
 import 'super_base.dart';
 
@@ -46,19 +48,19 @@ class CartState extends State<Cart> with Superbase {
     setState(() {
       loadingProducts = true;
     });
-    var data1 = {
-      "api_token": token,
-    };
 
+    loadItems(server: server);
+  }
+
+  void loadItems({bool server: false}) async {
     this.ajax(
         url: "cart?token=${await findToken}",
         server: server,
-        data: FormData.fromMap(data1),
         onValue: (object, url) {
           print(object);
           setState(() {
             loadingProducts = false;
-            if (object is Map) {
+            if (object is Map && object['data'] != null) {
               productsList = (object['data'] as Iterable)
                   .map((e) => CartItem.fromJson(e))
                   .toList();
@@ -66,6 +68,8 @@ class CartState extends State<Cart> with Superbase {
                   0,
                   (previousValue, element) =>
                       previousValue + element.productCart.totalQuantity);
+            } else {
+              productsList = [];
             }
           });
         },
@@ -477,7 +481,22 @@ class CartState extends State<Cart> with Superbase {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(25)),
                           color: Colors.green,
-                          onPressed: () async {},
+                          onPressed: () async {
+                            if (await findUser == null) {
+                              Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(
+                                      builder: (context) => Authentication()));
+                              return;
+                            }
+
+                            await showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                builder: (context) => CheckoutForm());
+
+                            loadItems();
+                          },
                           textColor: Colors.white,
                           child: Text("Checkout"),
                         ),

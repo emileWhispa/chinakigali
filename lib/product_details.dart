@@ -5,6 +5,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 
 import 'json/product.dart';
 import 'product_item.dart';
@@ -50,6 +51,26 @@ class _ProductDetailsState extends State<ProductDetails> with Superbase {
                 .toList();
           });
         });
+  }
+
+  bool _processingWishList = false;
+
+  bool _favorite = false;
+
+  void addToWishList() async {
+    setState(() {
+      _processingWishList = true;
+    });
+    await ajax(
+        url:
+            "wishlist/${_favorite ? "delete" : "add"}?token=${await findToken}&product_id=${widget.pro.id}",
+        onValue: (s, v) {
+          print(s);
+          Get.snackbar("Success", s['message']);
+        });
+    setState(() {
+      _processingWishList = false;
+    });
   }
 
   @override
@@ -142,11 +163,20 @@ class _ProductDetailsState extends State<ProductDetails> with Superbase {
                           ),
                           IconButton(
                             splashColor: Theme.of(context).accentColor,
-                            icon: Icon(
-                              Icons.favorite_outline_rounded,
-                              size: 28.0,
-                            ),
-                            onPressed: () {},
+                            icon: _processingWishList
+                                ? SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 1,
+                                    ))
+                                : Icon(
+                                    Icons.favorite_outline_rounded,
+                                    size: 28.0,
+                                    color: color,
+                                  ),
+                            onPressed:
+                                _processingWishList ? null : addToWishList,
                           )
                         ],
                       ),

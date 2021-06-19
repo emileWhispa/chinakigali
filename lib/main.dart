@@ -4,6 +4,7 @@ import 'package:chinakigali/authentication.dart';
 import 'package:chinakigali/cart.dart';
 import 'package:chinakigali/categories.dart';
 import 'package:chinakigali/products.dart';
+import 'package:chinakigali/profile.dart';
 import 'package:chinakigali/super_base.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -118,8 +119,9 @@ class _MyHomePageState extends State<MyHomePage> with Superbase {
                 key: _cartKey,
               ),
               Categories(cartCounter: cartCounter),
-              Center(),
-              Center(),
+              Profile(
+                user: _user,
+              ),
             ],
           ),
         ],
@@ -128,7 +130,7 @@ class _MyHomePageState extends State<MyHomePage> with Superbase {
         currentIndex: selected,
         unselectedItemColor: Colors.grey,
         onTap: (i) {
-          if (i == 4 && _user == null) {
+          if (i == 3 && _user == null) {
             Navigator.push(context,
                 CupertinoPageRoute(builder: (context) => Authentication()));
             return;
@@ -158,8 +160,6 @@ class _MyHomePageState extends State<MyHomePage> with Superbase {
               label: "Cart"),
           BottomNavigationBarItem(
               icon: Icon(Icons.category_rounded), label: "Categories"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.bookmark_rounded), label: "Orders"),
           BottomNavigationBarItem(
               icon: Icon(Icons.person_rounded), label: "Me"),
         ],

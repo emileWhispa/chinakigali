@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:badges/badges.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chinakigali/checkout_form.dart';
 import 'package:dio/dio.dart';
@@ -207,6 +208,14 @@ class CartState extends State<Cart> with Superbase {
         body: SizedBox.expand(
           child: Column(
             children: [
+              productsList.isEmpty
+                  ? SizedBox.shrink()
+                  : Container(
+                      decoration: BoxDecoration(color: Color(0xffE6FBFE)),
+                      padding: EdgeInsets.all(12),
+                      child: Text(
+                          "Please note that if your order is more than 1,000,000 RWF, we will contact you for confirmation"),
+                    ),
               loadingProducts
                   ? Expanded(
                       child: Container(

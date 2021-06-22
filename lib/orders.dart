@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chinakigali/json/order.dart';
 import 'package:chinakigali/order_details.dart';
 import 'package:chinakigali/super_base.dart';
@@ -29,6 +30,7 @@ class _OrdersState extends State<Orders> with Superbase {
     await ajax(
         url: "account/orders?customer_id=${(await findUser)?.id}",
         onValue: (source, url) {
+          print(source);
           setState(() {
             if (source is Map && source['data'] != null)
               _orders = (source['data'] as Iterable)
@@ -57,6 +59,7 @@ class _OrdersState extends State<Orders> with Superbase {
               itemBuilder: (context, index) {
                 var order = _orders[index];
                 return Card(
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
                   child: InkWell(
                     onTap: () {
                       Navigator.push(
@@ -65,31 +68,53 @@ class _OrdersState extends State<Orders> with Superbase {
                               builder: (BuildContext context) =>
                                   OrderDetail(order: order)));
                     },
-                    child: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "${fmtNbr(order.total)} RWF",
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                    child: Row(
+                      children: [
+                        Image(
+                            height: 90,
+                            width: 90,
+                            fit: BoxFit.cover,
+                            image:
+                                CachedNetworkImageProvider(order.image ?? "")),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 15, vertical: 8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "${order.name}",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                ),
+                                SizedBox(height: 3),
+                                Text(
+                                  "${fmtNbr(order.total)} RWF",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(height: 3),
+                                Row(
+                                  children: [
+                                    Text("${order.time ?? ""}"),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 3,
+                                ),
+                                Text("Order track Id : ${order.trackId}"),
+                                // order.notes?.trim().isNotEmpty == true
+                                //     ? Padding(
+                                //         padding: const EdgeInsets.only(top: 3),
+                                //         child: Text("${order.notes}"),
+                                //       )
+                                //     : SizedBox.shrink()
+                              ],
+                            ),
                           ),
-                          SizedBox(
-                            height: 3,
-                          ),
-                          Text("${order.time ?? ""} RWF"),
-                          SizedBox(
-                            height: 3,
-                          ),
-                          Text("Order track Id : ${order.trackId}"),
-                          // order.notes?.trim().isNotEmpty == true
-                          //     ? Padding(
-                          //         padding: const EdgeInsets.only(top: 3),
-                          //         child: Text("${order.notes}"),
-                          //       )
-                          //     : SizedBox.shrink()
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 );

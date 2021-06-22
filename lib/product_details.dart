@@ -63,7 +63,7 @@ class _ProductDetailsState extends State<ProductDetails> with Superbase {
     });
     await ajax(
         url:
-            "wishlist/${_favorite ? "delete" : "add"}?token=${await findToken}&product_id=${widget.pro.id}",
+            "wishlist/${_favorite ? "delete" : "add"}?token=${await findToken}&product_id=${widget.pro.id}&customer_id=${(await findUser)?.id}",
         onValue: (s, v) {
           print(s);
           Get.snackbar("Success", s['message']);
@@ -252,39 +252,46 @@ class _ProductDetailsState extends State<ProductDetails> with Superbase {
                   ],
                 ),
               ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 45,
-                      child: RaisedButton.icon(
-                        color: Theme.of(context).accentColor,
-                        elevation: 0,
-                        onPressed: () {
-                          showAddCart(context, widget.pro);
-                        },
-                        textColor: Colors.white,
-                        icon: Icon(Icons.add_shopping_cart_rounded),
-                        label: Text("Add to cart"),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: 45,
-                    child: RaisedButton.icon(
-                      shape: RoundedRectangleBorder(),
-                      elevation: 0,
-                      onPressed: () {},
-                      textColor: Colors.white,
-                      icon: Icon(Icons.share_rounded),
-                      label: Text("Share"),
-                    ),
-                  ),
-                ],
-              )
+              // Row(
+              //   children: [
+              //     Expanded(
+              //       child: Container(
+              //         height: 45,
+              //         child: RaisedButton.icon(
+              //           color: Theme.of(context).accentColor,
+              //           elevation: 0,
+              //           onPressed: () {
+              //             showAddCart(context, widget.pro);
+              //           },
+              //           textColor: Colors.white,
+              //           icon: Icon(Icons.add_shopping_cart_rounded),
+              //           label: Text("Add to cart"),
+              //         ),
+              //       ),
+              //     ),
+              //     // Container(
+              //     //   height: 45,
+              //     //   child: RaisedButton.icon(
+              //     //     shape: RoundedRectangleBorder(),
+              //     //     elevation: 0,
+              //     //     onPressed: () {},
+              //     //     textColor: Colors.white,
+              //     //     icon: Icon(Icons.share_rounded),
+              //     //     label: Text("Share"),
+              //     //   ),
+              //     // ),
+              //   ],
+              // )
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          showAddCart(context, widget.pro);
+        },
+        label: Text("Add To Cart"),
+        icon: Icon(Icons.add_shopping_cart),
       ),
     );
   }

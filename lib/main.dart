@@ -34,9 +34,14 @@ class MyApp extends StatelessWidget {
           // Notice that the counter didn't reset back to zero; the application
           // is not restarted.
           primarySwatch: Colors.red,
+          scaffoldBackgroundColor: Colors.grey.shade200,
           appBarTheme: AppBarTheme(
               actionsIconTheme: IconThemeData(color: Colors.red),
-              textTheme: TextTheme(headline6: TextStyle(color: Colors.black)),
+              textTheme: TextTheme(
+                  headline6: Theme.of(context)
+                      .primaryTextTheme
+                      .headline6
+                      ?.copyWith(color: Colors.black)),
               iconTheme: IconThemeData(color: Colors.red),
               backgroundColor: Colors.white)),
       home: MyHomePage(title: 'China kigali'),
@@ -126,6 +131,10 @@ class _MyHomePageState extends State<MyHomePage> with Superbase {
               Categories(cartCounter: cartCounter),
               Profile(
                 user: _user,
+                refreshUser: () async {
+                  _user = await findUser;
+                  setState(() {});
+                },
               ),
             ],
           ),

@@ -1,17 +1,20 @@
 import 'package:chinakigali/authentication.dart';
+import 'package:chinakigali/edit_profile.dart';
 import 'package:chinakigali/super_base.dart';
 import 'package:chinakigali/wish_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'json/user.dart';
 import 'orders.dart';
 
 class Profile extends StatefulWidget {
   final User? user;
+  final VoidCallback? refreshUser;
 
-  const Profile({Key? key, this.user}) : super(key: key);
+  const Profile({Key? key, this.user, this.refreshUser}) : super(key: key);
   @override
   _ProfileState createState() => _ProfileState();
 }
@@ -41,23 +44,33 @@ class _ProfileState extends State<Profile> with Superbase {
             child: Column(
               children: [
                 Card(
-                  child: Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8),
-                        child: CircleAvatar(
-                          backgroundImage: AssetImage("assets/boys.jpg"),
+                  child: InkWell(
+                    onTap: () async {
+                      await Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                              builder: (context) =>
+                                  EditProfile(user: widget.user!)));
+                      widget.refreshUser?.call();
+                    },
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: CircleAvatar(
+                            backgroundImage: AssetImage("assets/boys.jpg"),
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: ListTile(
-                          title: Text(
-                              "${widget.user?.firstName} ${widget.user?.lastName}"),
-                          subtitle: Text("${widget.user?.phone}"),
-                          trailing: Icon(Icons.chevron_right_rounded),
+                        Expanded(
+                          child: ListTile(
+                            title: Text(
+                                "${widget.user?.firstName} ${widget.user?.lastName}"),
+                            subtitle: Text("${widget.user?.phone}"),
+                            trailing: Icon(Icons.chevron_right_rounded),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 Card(
@@ -95,12 +108,15 @@ class _ProfileState extends State<Profile> with Superbase {
                   child: Column(
                     children: [
                       ListTile(
+                        onTap: () async {
+                          String urlString =
+                              "https://wa.me/250786604987?text=Hello!%20%0AI%20need%20help%20on%20ChinaKigali%20App";
+                          if (await canLaunch(urlString)) {
+                            await launch(urlString);
+                          }
+                        },
                         leading: Icon(Icons.help_rounded),
                         title: Text("Help"),
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.share_rounded),
-                        title: Text("Invite a friend"),
                       ),
                       ListTile(
                         onTap: () {
@@ -130,8 +146,14 @@ class _ProfileState extends State<Profile> with Superbase {
                               },
                               context: context);
                         },
-                        leading: Icon(Icons.exit_to_app_rounded),
-                        title: Text("Exit"),
+                        leading: Icon(
+                          Icons.exit_to_app_rounded,
+                          color: color,
+                        ),
+                        title: Text(
+                          "Log out",
+                          style: TextStyle(color: color),
+                        ),
                       ),
                     ],
                   ),

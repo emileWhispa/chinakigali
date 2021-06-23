@@ -119,10 +119,10 @@ class _RegistrationState extends State<Registration> with Superbase {
                       child: TextFormField(
                         controller: _firstNameController,
                         validator: (s) => s?.trim().isEmpty == true
-                            ? "Customer First name is required"
+                            ? "First name is required"
                             : null,
                         decoration: InputDecoration(
-                            hintText: "Customer First name",
+                            hintText: "First name",
                             filled: true,
                             contentPadding: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 0),
@@ -137,10 +137,10 @@ class _RegistrationState extends State<Registration> with Superbase {
                       child: TextFormField(
                         controller: _lastNameController,
                         validator: (s) => s?.trim().isEmpty == true
-                            ? "Customer Last name is required"
+                            ? "Last name is required"
                             : null,
                         decoration: InputDecoration(
-                            hintText: "Customer Last name",
+                            hintText: "Last name",
                             filled: true,
                             contentPadding: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 0),

@@ -480,7 +480,9 @@ class CartState extends State<Cart> with Superbase {
                         dense: true,
                         title: Text("Sub total"),
                         subtitle: Text(
-                            "${fmtNbr(productsList.fold<double>(0.0, (previousValue, element) => previousValue + element.productCart.total))} RWF"),
+                          "${fmtNbr(productsList.fold<double>(0.0, (previousValue, element) => previousValue + element.productCart.total))} RWF",
+                          style: TextStyle(color: color),
+                        ),
                         trailing: RaisedButton(
                           elevation: 0,
                           shape: RoundedRectangleBorder(

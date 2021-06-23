@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chinakigali/json/order.dart';
+import 'package:chinakigali/json/order_history.dart';
 import 'package:chinakigali/order_details.dart';
 import 'package:chinakigali/super_base.dart';
 import 'package:flutter/cupertino.dart';
@@ -55,18 +56,21 @@ class _OrdersState extends State<Orders> with Superbase {
               child: CircularProgressIndicator(),
             )
           : ListView.builder(
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
               itemCount: _orders.length,
               itemBuilder: (context, index) {
                 var order = _orders[index];
                 return Card(
                   clipBehavior: Clip.antiAliasWithSaveLayer,
                   child: InkWell(
-                    onTap: () {
+                    onTap: () async {
+                      var usr = await findUser;
                       Navigator.push(
                           context,
                           CupertinoPageRoute(
                               builder: (BuildContext context) =>
-                                  OrderDetail(order: order)));
+                                  OrderDetail(order: order, user: usr)));
                     },
                     child: Row(
                       children: [

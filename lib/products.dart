@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:chinakigali/json/slide.dart';
+import 'package:chinakigali/list_products.dart';
 import 'package:chinakigali/product_details.dart';
 import 'package:chinakigali/product_item.dart';
 import 'package:chinakigali/search_delegate.dart';
@@ -54,7 +55,7 @@ class _ProductsState extends State<Products> with Superbase {
     super.initState();
   }
 
-  getSlide() {
+  void getSlide() {
     this.ajax(
         url: "slides",
         server: false,
@@ -70,6 +71,16 @@ class _ProductsState extends State<Products> with Superbase {
             loadingCategories = false;
           });
         });
+  }
+
+  void goToMore(String url, String title) {
+    Navigator.push(
+        context,
+        CupertinoPageRoute(
+            builder: (context) => ListProduct(
+                  url: url,
+                  title: title,
+                )));
   }
 
   getCategories() async {
@@ -241,7 +252,8 @@ class _ProductsState extends State<Products> with Superbase {
                   size: 28.0,
                   color: color,
                 ),
-                onPressed: () {},
+                onPressed: () =>
+                    goToMore("products/newarrivals?limit=50", "New Arrivals"),
               )
             ],
           ),
@@ -294,7 +306,8 @@ class _ProductsState extends State<Products> with Superbase {
                   size: 28.0,
                   color: color,
                 ),
-                onPressed: () {},
+                onPressed: () =>
+                    goToMore("products/specials?limit=50", "Special Products"),
               )
             ],
           ),
@@ -344,7 +357,8 @@ class _ProductsState extends State<Products> with Superbase {
                   size: 28.0,
                   color: color,
                 ),
-                onPressed: () {},
+                onPressed: () =>
+                    goToMore("products/featured?limit=50", "Featured Products"),
               )
             ],
           ),
@@ -393,7 +407,8 @@ class _ProductsState extends State<Products> with Superbase {
                   size: 28.0,
                   color: color,
                 ),
-                onPressed: () {},
+                onPressed: () => goToMore(
+                    "products/bestseller?limit=50", "Best Selling Products"),
               )
             ],
           ),

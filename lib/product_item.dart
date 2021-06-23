@@ -46,13 +46,33 @@ class _ProductItemState extends State<ProductItem> with Superbase {
             mainAxisSize: MainAxisSize.max,
             children: [
               Expanded(
-                child: Container(
-                  margin: EdgeInsets.only(bottom: 5),
-                  decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: CachedNetworkImageProvider(
-                              "${widget.product.image}"),
-                          fit: BoxFit.cover)),
+                child: Stack(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(bottom: 5),
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: CachedNetworkImageProvider(
+                                  "${widget.product.image}"),
+                              fit: BoxFit.cover)),
+                    ),
+                    Positioned(
+                      child: widget.product.hasDiscount
+                          ? Container(
+                              decoration: BoxDecoration(
+                                  color: color,
+                                  borderRadius: BorderRadius.circular(5)),
+                              padding: EdgeInsets.all(3),
+                              child: Text(
+                                "${widget.product.discountPercent}",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            )
+                          : SizedBox.shrink(),
+                      right: 10,
+                      top: 10,
+                    )
+                  ],
                 ),
               ),
               Padding(

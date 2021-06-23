@@ -8,6 +8,7 @@ class Product {
   String image;
   String description;
   int? discountedPrice;
+  String? discountPercent;
 
   bool selected = false;
   bool deleting = false;
@@ -24,6 +25,7 @@ class Product {
         _price = int.tryParse(json['product_price'] ?? "0.0") ?? 0,
         discountedPrice =
             int.tryParse(json['product_discount_price'] ?? "0.0") ?? 0,
+        discountPercent = json['product_discount'],
         image = json['product_image'];
 
   int get price => _price ?? 0;
@@ -42,6 +44,8 @@ class Product {
           "detailed": {"image_path": image}
         }
       };
+
+  bool get hasDiscount => discountPercent?.trim().isNotEmpty == true;
 }
 
 class CartItem {

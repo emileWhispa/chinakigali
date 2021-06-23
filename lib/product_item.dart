@@ -8,8 +8,13 @@ import 'package:flutter/material.dart';
 class ProductItem extends StatefulWidget {
   final Product product;
   final bool isSpecial;
+  final Notifier? cartCounter;
 
-  const ProductItem({Key? key, required this.product, this.isSpecial: false})
+  const ProductItem(
+      {Key? key,
+      required this.product,
+      this.isSpecial: false,
+      this.cartCounter})
       : super(key: key);
   @override
   _ProductItemState createState() => _ProductItemState();
@@ -30,6 +35,7 @@ class _ProductItemState extends State<ProductItem> with Superbase {
               CupertinoPageRoute(
                   builder: (context) => ProductDetails(
                         pro: widget.product,
+                        cartCounter: widget.cartCounter,
                       )));
         },
         child: Container(
@@ -115,7 +121,8 @@ class _ProductItemState extends State<ProductItem> with Superbase {
                     child: RawMaterialButton(
                       shape: new CircleBorder(),
                       onPressed: () {
-                        showAddCart(context, widget.product);
+                        showAddCart(context, widget.product,
+                            cartCounter: widget.cartCounter);
                       },
                       child: Icon(
                         Icons.add_shopping_cart_rounded,

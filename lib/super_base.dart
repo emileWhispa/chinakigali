@@ -11,6 +11,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'json/product.dart';
 import 'json/user.dart';
 
+typedef Notifier = Function(int count, {bool increment});
+
 class MyBehavior extends ScrollBehavior {
   @override
   Widget buildViewportChrome(
@@ -78,7 +80,7 @@ class Superbase {
     return fmt(test.toString());
   }
 
-  showAddCart(BuildContext context, Product pro) {
+  showAddCart(BuildContext context, Product pro, {Notifier? cartCounter}) {
     showModalBottomSheet(
         context: context,
         useRootNavigator: true,
@@ -101,6 +103,7 @@ class Superbase {
                     if (Navigator.canPop(context)) {
                       Navigator.pop(context);
                     }
+                    cartCounter?.call(pro.quantity, increment: true);
                     gt.Get.snackbar("Success", source['message'],
                         icon: Icon(Icons.check_circle_rounded));
                   });

@@ -13,8 +13,6 @@ import 'authentication.dart';
 import 'json/product.dart';
 import 'super_base.dart';
 
-typedef Notifier = Function(int count, {bool increment});
-
 class Cart extends StatefulWidget {
   final Notifier? cartCounter;
 
@@ -58,7 +56,6 @@ class CartState extends State<Cart> with Superbase {
         url: "cart?token=${await findToken}",
         server: server,
         onValue: (object, url) {
-          print(object);
           setState(() {
             loadingProducts = false;
             if (object is Map && object['data'] != null) {
@@ -69,6 +66,7 @@ class CartState extends State<Cart> with Superbase {
                   0,
                   (previousValue, element) =>
                       previousValue + element.productCart.totalQuantity);
+              widget.cartCounter?.call(fold);
             } else {
               productsList = [];
             }
@@ -145,7 +143,6 @@ class CartState extends State<Cart> with Superbase {
     await this.ajax(
         url: "cart/delete?token=${await findToken}&product_id=${pro.productId}",
         onValue: (source, url) {
-          print(source);
           reLoad();
         });
     Navigator.maybePop(context);
@@ -157,7 +154,6 @@ class CartState extends State<Cart> with Superbase {
         url:
             "cart/update?token=${await findToken}&product_id=${pro.productId}&quantity=${pro.quantity}",
         onValue: (source, url) {
-          print(source);
           reLoad();
         });
     Navigator.maybePop(context);

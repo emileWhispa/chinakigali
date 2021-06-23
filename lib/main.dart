@@ -72,7 +72,11 @@ class _MyHomePageState extends State<MyHomePage> with Superbase {
 
   String? _token;
 
-  cartCounter(d, {bool? increment}) {}
+  void cartCounter(int d, {bool? increment}) {
+    setState(() {
+      cartCount = increment == true ? d + cartCount : d;
+    });
+  }
 
   @override
   void initState() {
@@ -117,6 +121,7 @@ class _MyHomePageState extends State<MyHomePage> with Superbase {
               Products(cartCounter: cartCounter),
               Cart(
                 key: _cartKey,
+                cartCounter: cartCounter,
               ),
               Categories(cartCounter: cartCounter),
               Profile(

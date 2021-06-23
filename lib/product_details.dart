@@ -11,8 +11,6 @@ import 'json/product.dart';
 import 'product_item.dart';
 import 'super_base.dart';
 
-typedef Notifier = Function(int count, {bool increment});
-
 class ProductDetails extends StatefulWidget {
   final Product pro;
   final Notifier? cartCounter;
@@ -242,7 +240,9 @@ class _ProductDetailsState extends State<ProductDetails> with Superbase {
                                   itemCount: _related.length,
                                   itemBuilder: (context, index) {
                                     return ProductItem(
-                                        product: _related[index]);
+                                      product: _related[index],
+                                      cartCounter: widget.cartCounter,
+                                    );
                                   }),
                             )
                           ],
@@ -288,7 +288,7 @@ class _ProductDetailsState extends State<ProductDetails> with Superbase {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          showAddCart(context, widget.pro);
+          showAddCart(context, widget.pro, cartCounter: widget.cartCounter);
         },
         label: Text("Add To Cart"),
         icon: Icon(Icons.add_shopping_cart),

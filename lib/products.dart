@@ -57,6 +57,7 @@ class _ProductsState extends State<Products> with Superbase {
   getSlide() {
     this.ajax(
         url: "slides",
+        server: false,
         onValue: (object, url) {
           setState(() {
             slides = (object['data'] as Iterable)
@@ -270,7 +271,10 @@ class _ProductsState extends State<Products> with Superbase {
                                   childAspectRatio: 2.7 / 4),
                           itemCount: newArrivalsList.length,
                           itemBuilder: (context, index) {
-                            return ProductItem(product: newArrivalsList[index]);
+                            return ProductItem(
+                              product: newArrivalsList[index],
+                              cartCounter: widget.cartCounter,
+                            );
                           }),
                     ),
           Row(
@@ -319,6 +323,7 @@ class _ProductsState extends State<Products> with Superbase {
                         return ProductItem(
                           product: specialProductsList[index],
                           isSpecial: true,
+                          cartCounter: widget.cartCounter,
                         );
                       },
                       itemCount: specialProductsList.length),
@@ -365,7 +370,10 @@ class _ProductsState extends State<Products> with Superbase {
                       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                           maxCrossAxisExtent: 200, childAspectRatio: 2.7 / 4),
                       itemBuilder: (context, index) {
-                        return ProductItem(product: productsList[index]);
+                        return ProductItem(
+                          product: productsList[index],
+                          cartCounter: widget.cartCounter,
+                        );
                       },
                       itemCount: productsList.length),
           Row(
@@ -411,7 +419,10 @@ class _ProductsState extends State<Products> with Superbase {
                       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                           maxCrossAxisExtent: 200, childAspectRatio: 2.7 / 4),
                       itemBuilder: (context, index) {
-                        return ProductItem(product: bestSellingList[index]);
+                        return ProductItem(
+                          product: bestSellingList[index],
+                          cartCounter: widget.cartCounter,
+                        );
                       },
                       itemCount: bestSellingList.length)
         ],

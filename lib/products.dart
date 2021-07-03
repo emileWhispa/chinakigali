@@ -278,8 +278,8 @@ class _ProductsState extends State<Products> with Superbase {
                           physics: NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           gridDelegate:
-                              SliverGridDelegateWithMaxCrossAxisExtent(
-                                  maxCrossAxisExtent: 200,
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
                                   childAspectRatio: 2.7 / 4),
                           itemCount: newArrivalsList.length,
                           itemBuilder: (context, index) {
@@ -330,8 +330,8 @@ class _ProductsState extends State<Products> with Superbase {
                   : GridView.builder(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                          maxCrossAxisExtent: 200, childAspectRatio: 2.7 / 4),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3, childAspectRatio: 2.7 / 4),
                       itemBuilder: (context, index) {
                         return ProductItem(
                           product: specialProductsList[index],
@@ -381,8 +381,8 @@ class _ProductsState extends State<Products> with Superbase {
                   : GridView.builder(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                          maxCrossAxisExtent: 200, childAspectRatio: 2.7 / 4),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3, childAspectRatio: 2.7 / 4),
                       itemBuilder: (context, index) {
                         return ProductItem(
                           product: productsList[index],
@@ -431,8 +431,8 @@ class _ProductsState extends State<Products> with Superbase {
                   : GridView.builder(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                          maxCrossAxisExtent: 200, childAspectRatio: 2.7 / 4),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3, childAspectRatio: 2.7 / 4),
                       itemBuilder: (context, index) {
                         return ProductItem(
                           product: bestSellingList[index],

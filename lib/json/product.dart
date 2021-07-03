@@ -9,6 +9,7 @@ class Product {
   String description;
   int? discountedPrice;
   String? discountPercent;
+  List<String>? images;
 
   bool selected = false;
   bool deleting = false;
@@ -26,6 +27,7 @@ class Product {
         discountedPrice =
             int.tryParse(json['product_discount_price'] ?? "0.0") ?? 0,
         discountPercent = json['product_discount'],
+  images = (json['product_images'] as Iterable?)?.map((e) => e.toString()).toList() ??[],
         image = json['product_image'];
 
   int get price => _price ?? 0;

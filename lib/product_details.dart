@@ -38,15 +38,22 @@ class _ProductDetailsState extends State<ProductDetails> with Superbase {
   }
 
   List<Product> _related = [];
+  List<String> images = [];
 
   void loadRelated() {
     this.ajax(
         url: "product/details?product_id=${widget.pro.id}",
+        error: (s,v)=>print(s),
+        server: false,
         onValue: (source, url) {
           setState(() {
             _related = (source['data']['related_products'] as Iterable)
                 .map((e) => Product.fromJson(e))
                 .toList();
+            images = (source['data']['product_images'] as Iterable?)
+                ?.map((e) => '$e')
+                .toList() ?? [];
+            print(images.length);
           });
         });
   }
@@ -104,7 +111,7 @@ class _ProductDetailsState extends State<ProductDetails> with Superbase {
                         options: CarouselOptions(
                           height: 180.0,
                         ),
-                        items: [widget.pro.image].map((i) {
+                        items: ( images.isNotEmpty ? images : [widget.pro.image]).map((i) {
                           return Builder(
                             builder: (BuildContext context) {
                               return Container(

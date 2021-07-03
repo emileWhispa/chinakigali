@@ -186,7 +186,7 @@ class _RegistrationState extends State<Registration> with Superbase {
                       : null,
                   controller: _phoneController,
                   decoration: InputDecoration(
-                      hintText: "Shop Phone Number",
+                      hintText: "Phone Number",
                       filled: true,
                       prefixIcon: Icon(Icons.call),
                       contentPadding:
@@ -247,7 +247,7 @@ class _RegistrationState extends State<Registration> with Superbase {
                             : null,
                         controller: _addressController,
                         decoration: InputDecoration(
-                            hintText: "Address One",
+                            hintText: "Address 1",
                             filled: true,
                             contentPadding: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 0),
@@ -265,7 +265,7 @@ class _RegistrationState extends State<Registration> with Superbase {
                             : null,
                         controller: _addressTwoController,
                         decoration: InputDecoration(
-                            hintText: "Address Two",
+                            hintText: "Address 2",
                             filled: true,
                             contentPadding: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 0),

@@ -53,7 +53,6 @@ class _ProductDetailsState extends State<ProductDetails> with Superbase {
             images = (source['data']['product_images'] as Iterable?)
                 ?.map((e) => '$e')
                 .toList() ?? [];
-            print(images.length);
           });
         });
   }

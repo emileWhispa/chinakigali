@@ -8,6 +8,9 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 import 'json/product.dart';
+import 'json/product_color.dart';
+import 'json/product_size.dart';
+import 'json/production_option.dart';
 import 'product_item.dart';
 import 'super_base.dart';
 
@@ -40,10 +43,18 @@ class _ProductDetailsState extends State<ProductDetails> with Superbase {
   List<Product> _related = [];
   List<String> images = [];
 
+  List<Colour> productColors = [];
+  List<Option> productOptions = [];
+  List<ProductSize> productSizes = [];
+
+  String? colour;
+  String? size;
+  String? option;
+
   void loadRelated() {
     this.ajax(
         url: "product/details?product_id=${widget.pro.id}",
-        error: (s,v)=>print(s),
+        error: (s, v) => print(s),
         server: false,
         onValue: (source, url) {
           setState(() {
@@ -51,8 +62,21 @@ class _ProductDetailsState extends State<ProductDetails> with Superbase {
                 .map((e) => Product.fromJson(e))
                 .toList();
             images = (source['data']['product_images'] as Iterable?)
-                ?.map((e) => '$e')
-                .toList() ?? [];
+                    ?.map((e) => '$e')
+                    .toList() ??
+                [];
+            productColors = (source['data']['product_colors'] as Iterable?)
+                    ?.map((e) => Colour.fromJson(e))
+                    .toList() ??
+                [];
+            productOptions = (source['data']['product_options'] as Iterable?)
+                    ?.map((e) => Option.fromJson(e))
+                    .toList() ??
+                [];
+            productSizes = (source['data']['product_sizes'] as Iterable?)
+                    ?.map((e) => ProductSize.fromJson(e))
+                    .toList() ??
+                [];
           });
         });
   }
@@ -108,9 +132,10 @@ class _ProductDetailsState extends State<ProductDetails> with Superbase {
                     SliverToBoxAdapter(
                       child: CarouselSlider(
                         options: CarouselOptions(
-                          height: 180.0,
+                          height: 230.0,
                         ),
-                        items: ( images.isNotEmpty ? images : [widget.pro.image]).map((i) {
+                        items: (images.isNotEmpty ? images : [widget.pro.image])
+                            .map((i) {
                           return Builder(
                             builder: (BuildContext context) {
                               return Container(
@@ -160,7 +185,7 @@ class _ProductDetailsState extends State<ProductDetails> with Superbase {
                             padding: EdgeInsets.only(
                                 top: 10, left: 10, right: 10, bottom: 5),
                             child: Text(
-                              "${widget.pro.price} RWF",
+                              "${fmtNbr(widget.pro.price)} RWF",
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 15),
                             ),
@@ -197,6 +222,205 @@ class _ProductDetailsState extends State<ProductDetails> with Superbase {
                               child: Text(
                                 "${widget.pro.description == ".." ? "There is no description for this product" : widget.pro.description}",
                                 style: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                            productColors.isNotEmpty
+                                ? Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: Text(
+                                      "Colors",
+                                      style:
+                                          Theme.of(context).textTheme.headline6,
+                                    ),
+                                  )
+                                : SizedBox.shrink(),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10),
+                              child: Wrap(
+                                children: productColors
+                                    .map((e) => Container(
+                                          margin: EdgeInsets.only(right: 5),
+                                          child: OutlinedButton(
+                                            style: e.selected
+                                                ? ButtonStyle(
+                                                    backgroundColor:
+                                                        MaterialStateProperty
+                                                            .all(Colors
+                                                                .grey.shade300))
+                                                : null,
+                                            onPressed: () {
+                                              setState(() {
+                                                colour = e.id;
+                                                productColors.forEach(
+                                                    (element) => element
+                                                        .selected = false);
+                                                e.selected = true;
+                                              });
+                                            },
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(4)),
+                                              padding: EdgeInsets.all(6),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    "${e.name}".toUpperCase(),
+                                                    style: TextStyle(
+                                                        color: e.color),
+                                                  ),
+                                                  Container(
+                                                    width: 20,
+                                                    height: 20,
+                                                    margin: EdgeInsets.only(
+                                                        left: 3),
+                                                    decoration: BoxDecoration(
+                                                        color: e.color,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(2)),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ))
+                                    .toList(),
+                              ),
+                            ),
+                            productSizes.isNotEmpty
+                                ? Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: Text(
+                                      "Size",
+                                      style:
+                                          Theme.of(context).textTheme.headline6,
+                                    ),
+                                  )
+                                : SizedBox.shrink(),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10),
+                              child: Wrap(
+                                children: productSizes
+                                    .map((e) => Container(
+                                          margin: EdgeInsets.only(right: 5),
+                                          child: OutlinedButton(
+                                            style: e.selected
+                                                ? ButtonStyle(
+                                                    backgroundColor:
+                                                        MaterialStateProperty
+                                                            .all(Colors
+                                                                .grey.shade300))
+                                                : null,
+                                            onPressed: () {
+                                              setState(() {
+                                                size = e.id;
+                                                productSizes.forEach(
+                                                    (element) => element
+                                                        .selected = false);
+                                                e.selected = true;
+                                              });
+                                            },
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(4)),
+                                              padding: EdgeInsets.all(6),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    "${e.name}".toUpperCase(),
+                                                    style: TextStyle(),
+                                                  ),
+                                                  // Container(
+                                                  //   width: 20,
+                                                  //   height: 20,
+                                                  //   margin:
+                                                  //   EdgeInsets.only(left: 3),
+                                                  //   decoration: BoxDecoration(
+                                                  //     image: DecorationImage(
+                                                  //       image: CachedNetworkImageProvider(
+                                                  //         e.image
+                                                  //       )
+                                                  //     ),
+                                                  //       borderRadius: BorderRadius.circular(2)
+                                                  //   ),
+                                                  // )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ))
+                                    .toList(),
+                              ),
+                            ),
+                            productOptions.isNotEmpty
+                                ? Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: Text(
+                                      "Options",
+                                      style:
+                                          Theme.of(context).textTheme.headline6,
+                                    ),
+                                  )
+                                : SizedBox.shrink(),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10),
+                              child: Wrap(
+                                children: productOptions
+                                    .map((e) => Container(
+                                          margin: EdgeInsets.only(right: 5),
+                                          child: OutlinedButton(
+                                            style: e.selected
+                                                ? ButtonStyle(
+                                                    backgroundColor:
+                                                        MaterialStateProperty
+                                                            .all(Colors
+                                                                .grey.shade300))
+                                                : null,
+                                            onPressed: () {
+                                              setState(() {
+                                                option = e.id;
+                                                productOptions.forEach(
+                                                    (element) => element
+                                                        .selected = false);
+                                                e.selected = true;
+                                              });
+                                            },
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(4)),
+                                              padding: EdgeInsets.all(6),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    "${e.name}".toUpperCase(),
+                                                    style: TextStyle(),
+                                                  ),
+                                                  Container(
+                                                    width: 20,
+                                                    height: 20,
+                                                    margin: EdgeInsets.only(
+                                                        left: 3),
+                                                    decoration: BoxDecoration(
+                                                        image: DecorationImage(
+                                                            image:
+                                                                CachedNetworkImageProvider(
+                                                                    e.image)),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(2)),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ))
+                                    .toList(),
                               ),
                             ),
                             Row(
@@ -294,7 +518,7 @@ class _ProductDetailsState extends State<ProductDetails> with Superbase {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          showAddCart(context, widget.pro, cartCounter: widget.cartCounter);
+          showAddCart(context, widget.pro, cartCounter: widget.cartCounter,size: size,color: colour,option: option);
         },
         label: Text("Add To Cart"),
         icon: Icon(Icons.add_shopping_cart),

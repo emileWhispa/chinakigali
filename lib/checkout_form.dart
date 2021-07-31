@@ -3,6 +3,7 @@ import 'package:chinakigali/super_base.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class CheckoutForm extends StatefulWidget {
   @override
@@ -52,17 +53,40 @@ class _CheckoutFormState extends State<CheckoutForm> with Superbase {
     setState(() {
       _sending = true;
     });
+    var token = await findToken;
     await this.ajax(
         url:
-            "checkout?token=${await findToken}&customer_id=${(await findUser)?.id}&payment_method_id=$_id&order_notes=${Uri.encodeComponent(_controller.text)}",
+            "checkout?token=$token&customer_id=${(await findUser)?.id}&payment_method_id=$_id&order_notes=${Uri.encodeComponent(_controller.text)}",
         onValue: (source, url) async {
+          print(source);
           (await prefs).remove("token");
           await loadToken();
 
-          setState(() {
-            _sending = false;
+          ajax(url: "payment/dpo/?order_id=${source['order_info']['order_id']}&token=$token",server: true,onValue: (s,v)async{
+            print(s);
+
+            setState(() {
+              _sending = false;
+            });
+            await Navigator.push(context, CupertinoPageRoute(builder: (context){
+              return Scaffold(
+                appBar: AppBar(
+                  title: Text("Complete payment"),
+                ),
+                body: WebView(
+                  javascriptMode: JavascriptMode.unrestricted,
+                  initialUrl: s['data']['redirect_url'],
+                ),
+              );
+            }));
+          },error: (s,v){
+
+            setState(() {
+              _sending = false;
+            });
           });
-          Navigator.pop(context);
+
+          //Navigator.pop(context,true);
           Get.snackbar("Success", source['message'],
               icon: Icon(Icons.check_circle_rounded));
         },

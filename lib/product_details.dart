@@ -14,6 +14,65 @@ import 'json/production_option.dart';
 import 'product_item.dart';
 import 'super_base.dart';
 
+class TutorialOverlay extends ModalRoute<void> {
+
+  final WidgetBuilder builder;
+
+  TutorialOverlay({required this.builder});
+
+  @override
+  Duration get transitionDuration => Duration(milliseconds: 500);
+
+  @override
+  bool get opaque => false;
+
+  @override
+  bool get barrierDismissible => true;
+
+  @override
+  Color get barrierColor => Colors.black.withOpacity(0.5);
+
+  @override
+  String? get barrierLabel => null;
+
+  @override
+  bool get maintainState => true;
+
+  @override
+  Widget buildPage(
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      ) {
+    // This makes sure that text and other content follows the material style
+    return Material(
+      type: MaterialType.transparency,
+      // make sure that the overlay content is not cut off
+      child: SafeArea(
+        child: _buildOverlayContent(context),
+      ),
+    );
+  }
+
+  Widget _buildOverlayContent(BuildContext context) {
+    return builder.call(context);
+  }
+
+  @override
+  Widget buildTransitions(
+      BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+    // You can add your own animations for the overlay content
+    return FadeTransition(
+      opacity: animation,
+      child: ScaleTransition(
+        scale: animation,
+        child: child,
+      ),
+    );
+  }
+}
+
+
 class ProductDetails extends StatefulWidget {
   final Product pro;
   final Notifier? cartCounter;
@@ -138,16 +197,34 @@ class _ProductDetailsState extends State<ProductDetails> with Superbase {
                             .map((i) {
                           return Builder(
                             builder: (BuildContext context) {
-                              return Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).accentColor,
-                                  ),
-                                  child: Image(
-                                    image: CachedNetworkImageProvider(i),
-                                    fit: BoxFit.cover,
-                                  ));
+                              return InkWell(
+                                onTap: (){
+                                  Navigator.of(context).push(TutorialOverlay(builder: (context)=>Scaffold(
+                                    appBar: AppBar(
+                                      backgroundColor: Colors.transparent,
+                                      elevation: 0.0,
+                                    ),
+                                    extendBodyBehindAppBar: true,
+                                    //backgroundColor: Colors.black12,
+                                    body: Center(
+                                      child: Image(
+                                        image: CachedNetworkImageProvider(i),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  )));
+                                },
+                                child: Container(
+                                    width: MediaQuery.of(context).size.width,
+                                    margin: EdgeInsets.symmetric(horizontal: 5.0),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).accentColor,
+                                    ),
+                                    child: Image(
+                                      image: CachedNetworkImageProvider(i),
+                                      fit: BoxFit.cover,
+                                    )),
+                              );
                             },
                           );
                         }).toList(),
@@ -464,8 +541,8 @@ class _ProductDetailsState extends State<ProductDetails> with Superbase {
                                   physics: NeverScrollableScrollPhysics(),
                                   shrinkWrap: true,
                                   gridDelegate:
-                                      SliverGridDelegateWithMaxCrossAxisExtent(
-                                          maxCrossAxisExtent: 200,
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 3,
                                           childAspectRatio: 2.7 / 4),
                                   itemCount: _related.length,
                                   itemBuilder: (context, index) {

@@ -8,6 +8,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 import 'authentication.dart';
 import 'json/product.dart';
@@ -497,10 +498,15 @@ class CartState extends State<Cart> with Superbase {
                               return;
                             }
 
-                            await showModalBottomSheet(
+                            var b = await showModalBottomSheet<bool>(
                                 context: context,
+                                isDismissible: false,
                                 isScrollControlled: true,
                                 builder: (context) => CheckoutForm());
+
+                            if( b == true){
+
+                            }
 
                             loadItems();
                           },

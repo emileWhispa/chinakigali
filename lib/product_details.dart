@@ -1,8 +1,6 @@
-import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
@@ -45,13 +43,7 @@ class TutorialOverlay extends ModalRoute<void> {
       Animation<double> secondaryAnimation,
       ) {
     // This makes sure that text and other content follows the material style
-    return Material(
-      type: MaterialType.transparency,
-      // make sure that the overlay content is not cut off
-      child: SafeArea(
-        child: _buildOverlayContent(context),
-      ),
-    );
+    return _buildOverlayContent(context);
   }
 
   Widget _buildOverlayContent(BuildContext context) {
@@ -87,7 +79,6 @@ class ProductDetails extends StatefulWidget {
 }
 
 class _ProductDetailsState extends State<ProductDetails> with Superbase {
-  String? _token;
 
   List feedbacks = [];
 
@@ -160,9 +151,10 @@ class _ProductDetailsState extends State<ProductDetails> with Superbase {
     });
   }
 
+  TransformationController _tController = TransformationController();
+
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       appBar: AppBar(
         title: Column(
@@ -207,9 +199,20 @@ class _ProductDetailsState extends State<ProductDetails> with Superbase {
                                     extendBodyBehindAppBar: true,
                                     //backgroundColor: Colors.black12,
                                     body: Center(
-                                      child: Image(
-                                        image: CachedNetworkImageProvider(i),
-                                        fit: BoxFit.cover,
+                                      child: InteractiveViewer(
+                                        panEnabled: false,
+                                        // Set it to false to prevent panning.
+                                        boundaryMargin: const EdgeInsets.all(0),
+                                        minScale: 1,
+                                        maxScale: 4,
+                                        transformationController: _tController,
+                                        onInteractionEnd: (det) {
+                                          _tController.value = Matrix4.identity();
+                                        },
+                                        child: Image(
+                                          image: CachedNetworkImageProvider(i),
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
                                     ),
                                   )));
@@ -218,7 +221,7 @@ class _ProductDetailsState extends State<ProductDetails> with Superbase {
                                     width: MediaQuery.of(context).size.width,
                                     margin: EdgeInsets.symmetric(horizontal: 5.0),
                                     decoration: BoxDecoration(
-                                      color: Theme.of(context).accentColor,
+                                      color: Theme.of(context).colorScheme.secondary,
                                     ),
                                     child: Image(
                                       image: CachedNetworkImageProvider(i),
@@ -268,7 +271,7 @@ class _ProductDetailsState extends State<ProductDetails> with Superbase {
                             ),
                           ),
                           IconButton(
-                            splashColor: Theme.of(context).accentColor,
+                            splashColor: Theme.of(context).colorScheme.secondary,
                             icon: _processingWishList
                                 ? SizedBox(
                                     height: 20,
